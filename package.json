@@ -1,0 +1,30 @@
+{
+  "name": "task-runner-statusbar",
+  "displayName": "Task Runner Status Bar",
+  "description": "%extension.description%",
+  "version": "0.1.3",
+  "publisher": "a3st",
+  "author": "a3st",
+  "icon": "assets/icon.png",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "keywords": ["tasks", "tasks.json", "status bar", "task runner"],
+  "main": "./src/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "extensionKind": ["workspace"],
+  "capabilities": { "untrustedWorkspaces": { "supported": false } },
+  "contributes": {
+    "commands": [
+      { "command": "taskRunner.selectTask", "title": "%command.selectTask%", "category": "Task Runner" },
+      { "command": "taskRunner.runTask", "title": "%command.runTask%", "category": "Task Runner" },
+      { "command": "taskRunner.refreshTasks", "title": "%command.refreshTasks%", "category": "Task Runner" }
+    ]
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/extension.js && node --check src/task-model.js && node --check src/localization.js",
+    "package": "vsce package --allow-missing-repository --no-rewrite-relative-links --out task-runner-statusbar-0.1.3.vsix"
+  },
+  "devDependencies": { "@vscode/vsce": "^3.6.0" }
+}
