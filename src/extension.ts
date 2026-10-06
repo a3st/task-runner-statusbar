@@ -1,10 +1,23 @@
-'use strict';
+import type * as vscode from 'vscode';
+import { taskKey, configuredTasks, defaultTask, scopeLabel, statusLabel } from './task-model';
+import { createLocalizer } from './localization';
 
-const { taskKey, configuredTasks, defaultTask, scopeLabel, statusLabel } = require('./task-model');
-const { createLocalizer } = require('./localization');
+type VSCodeApi = typeof vscode;
+type ControllerContext = Pick<vscode.ExtensionContext, 'subscriptions' | 'workspaceState'>;
+
+interface TaskPickItem extends vscode.QuickPickItem {
+  task: vscode.Task;
+}
+
+export interface TaskController {
+  refresh(): Promise<boolean>;
+  pickTask(): Promise<vscode.Task | undefined>;
+  runTask(): Promise<void>;
+  ready: Promise<boolean>;
+}
 const SELECTION_KEY = 'selectedTask';
 
-function createController(api, context) {
+export function createController(api: VSCodeApi, context: ControllerContext): TaskController {
   const t = createLocalizer(api.env?.language);
   // VS Code's Problems counter uses priority 50 (visibility indicator: 49).
   // Lower priorities appear to its right in the left status bar group.
@@ -14,24 +27,25 @@ function createController(api, context) {
   select.name = t('status.selectName');
   run.name = t('status.runName');
   select.command = 'taskRunner.selectTask';
-  let tasks = [];
-  let selected;
-  let selectedKey = context.workspaceState.get(SELECTION_KEY);
+  let tasks: vscode.Task[] = [];
+  let selected: vscode.Task | undefined;
+  let selectedKey = context.workspaceState.get<string>(SELECTION_KEY);
   let revision = 0;
   let disposed = false;
   let starting = false;
-  let timer;
-  let refreshError;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let refreshError: string | undefined;
 
-  function render() {
+  function render(): void {
     if (disposed) return;
-    const running = selected && api.tasks.taskExecutions.some(execution => taskKey(execution.task) === taskKey(selected));
+    const currentTask = selected;
+    const running = currentTask && api.tasks.taskExecutions.some(execution => taskKey(execution.task) === taskKey(currentTask));
     select.text = `${selected ? t('status.selectedTask', statusLabel(selected)) : t('status.task')} $(chevron-down)`;
     select.tooltip = refreshError ? t('status.loadError', refreshError) : selected
       ? t('status.selectedTooltip', selected.name, scopeLabel(selected, api, t))
       : t('status.selectTooltip');
     run.text = starting || running ? '$(loading~spin)' : '$(play)';
-    run.tooltip = starting ? t('status.starting') : running
+    run.tooltip = starting ? t('status.starting') : running && selected
       ? t('status.running', selected.name)
       : selected ? t('status.runTooltip', selected.name) : t('status.selectAndRun');
     run.command = starting ? undefined : 'taskRunner.runTask';
@@ -41,13 +55,13 @@ function createController(api, context) {
     run.show();
   }
 
-  function logError(error) {
+  function logError(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error);
     output.appendLine(`[${new Date().toISOString()}] ${message}`);
     return message;
   }
 
-  async function refresh() {
+  async function refresh(): Promise<boolean> {
     const currentRevision = ++revision;
     try {
       const fetched = await api.tasks.fetchTasks();
@@ -66,12 +80,12 @@ function createController(api, context) {
     }
   }
 
-  function scheduleRefresh() {
+  function scheduleRefresh(): void {
     clearTimeout(timer);
     timer = setTimeout(() => { void refresh(); }, 250);
   }
 
-  async function pickTask() {
+  async function pickTask(): Promise<vscode.Task | undefined> {
     if (!await refresh()) {
       await api.window.showErrorMessage(t('error.message', refreshError ?? t('error.retrySelection')));
       return undefined;
@@ -81,7 +95,7 @@ function createController(api, context) {
       if (action) await api.commands.executeCommand('workbench.action.tasks.configureTaskRunner');
       return undefined;
     }
-    const choice = await api.window.showQuickPick(tasks.map(task => ({
+    const choice = await api.window.showQuickPick<TaskPickItem>(tasks.map(task => ({
       label: task.name,
       description: scopeLabel(task, api, t),
       detail: task.detail,
@@ -107,7 +121,7 @@ function createController(api, context) {
     return selected;
   }
 
-  async function runTask() {
+  async function runTask(): Promise<void> {
     if (starting || disposed) return;
     if (!api.workspace.isTrusted) {
       await api.window.showInformationMessage(t('tasks.trustRequired'));
@@ -155,8 +169,8 @@ function createController(api, context) {
   return { refresh, pickTask, runTask, ready: refresh() };
 }
 
-function activate(context) {
-  return createController(require('vscode'), context).ready;
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  // Load the editor API lazily so unit tests can inject their own API.
+  const api: VSCodeApi = require('vscode');
+  await createController(api, context).ready;
 }
-
-module.exports = { activate, createController };

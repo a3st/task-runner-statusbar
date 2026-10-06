@@ -2,9 +2,9 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { createController } = require('../src/extension');
-const { configuredTasks, taskKey } = require('../src/task-model');
-const { createLocalizer } = require('../src/localization');
+const { createController } = require('../dist/extension');
+const { configuredTasks, taskKey } = require('../dist/task-model');
+const { createLocalizer } = require('../dist/localization');
 
 function event() {
   const listeners = new Set();

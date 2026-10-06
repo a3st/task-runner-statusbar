@@ -1,133 +1,32 @@
 <div align="center">
-  <img src="assets/icon.png" alt="Task Runner Status Bar" width="144" height="144">
-
+  <img src="assets/icon.png" alt="Task Runner" width="96" height="96">
   <h1>Task Runner Status Bar</h1>
-  <p>Ваши задачи из <code>tasks.json</code> — в нижней строке VS Code.</p>
-  <p>Выберите задачу. Нажмите запуск. Продолжайте работать.</p>
-
-  <p>
-    <img src="https://img.shields.io/badge/VS_Code-1.85%2B-007ACC?style=flat-square" alt="VS Code 1.85+">
-    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&amp;logo=javascript&amp;logoColor=222222" alt="JavaScript">
-    <img src="https://img.shields.io/badge/languages-EN_%7C_RU-18E99D?style=flat-square" alt="English and Russian">
-    <img src="https://img.shields.io/badge/license-MIT-8B5CF6?style=flat-square" alt="MIT license">
-    <img src="https://img.shields.io/badge/author-a3st-555555?style=flat-square" alt="Author: a3st">
-  </p>
-
-  <p>
-    <a href="#установка">Установка</a> ·
-    <a href="#как-пользоваться">Как пользоваться</a> ·
-    <a href="#возможности">Возможности</a> ·
-    <a href="#разработка">Разработка</a>
-  </p>
+  <p>Your VS Code tasks, one click away.</p>
+  <p><strong>English</strong> · <a href="README.ru-RU.md">Русский</a></p>
 </div>
 
----
-
-Не нужно каждый раз искать задачу в палитре команд. **Task Runner Status Bar** размещает выбор задачи и кнопку запуска справа от счётчиков ошибок и предупреждений. Последняя выбранная задача сохраняется для рабочей области.
+Select a task from `tasks.json` in the status bar and run it with the adjacent play button.
 
 ```text
   ⓧ 0  ⚠ 0    Task: Build ▾    ▶
 ```
 
-В русском интерфейсе: `Задача: Build ▾`. Во время выполнения вместо кнопки запуска отображается индикатор активности.
+- Search tasks with VS Code's Quick Pick.
+- Keep your selection per workspace.
+- Refresh automatically when `tasks.json` changes.
+- Run tasks across workspace folders, including `dependsOn` tasks.
 
-## Установка
+English and Russian UI follow the editor's display language. Requires **VS Code 1.85+**.
 
-1. Получите `task-runner-statusbar-0.1.3.vsix`: используйте готовый файл или [соберите расширение из исходников](#разработка).
-2. Откройте **Extensions** в VS Code (`Ctrl+Shift+X`).
-3. Нажмите **… → Install from VSIX…** и выберите файл.
-4. Откройте рабочую область с `.vscode/tasks.json`.
+## Install & use
 
-> При обновлении с версий `0.1.0`–`0.1.2` удалите прежнее расширение издателя `local-task-tools`. Начиная с `0.1.3`, издатель — **a3st**; VS Code считает его отдельным расширением.
+Open **Extensions → … → Install from VSIX…** and select the `.vsix` file. Open a project with `.vscode/tasks.json`.
 
-Требуется **VS Code 1.85+**. Если нижняя строка скрыта, включите **View → Appearance → Status Bar**.
+Click **Task ▾**, choose a task, then click **▶** to run it. The controls sit to the right of the error and warning counters.
 
-## Как пользоваться
+## Development
 
-1. Нажмите **Task ▾** или **Задача ▾**.
-2. Найдите нужную задачу в списке с поиском и выберите её.
-3. Нажмите **▶** рядом, чтобы запустить выбранную задачу.
-
-Выбор и запуск — отдельные действия. Список открывается через стандартный **Quick Pick** VS Code в области ввода редактора. При первом открытии выбирается задача по умолчанию, а если её нет — первая доступная.
-
-### Пример `tasks.json`
-
-Создайте `.vscode/tasks.json` в своём проекте:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Build",
-      "type": "shell",
-      "command": "npm run build",
-      "problemMatcher": [],
-      "group": { "kind": "build", "isDefault": true }
-    },
-    {
-      "label": "Test",
-      "type": "shell",
-      "command": "npm test",
-      "problemMatcher": [],
-      "group": "test"
-    },
-    {
-      "label": "Build & Test",
-      "dependsOn": ["Build", "Test"],
-      "dependsOrder": "sequence",
-      "problemMatcher": []
-    }
-  ]
-}
-```
-
-В списке появятся **Build**, **Test** и **Build & Test**. Пример предполагает, что в `package.json` вашего проекта есть соответствующие скрипты. На Windows при ограничении выполнения PowerShell используйте `npm.cmd` вместо `npm`.
-
-## Возможности
-
-| Возможность | Как работает |
-| --- | --- |
-| Быстрый запуск | Выбор задачи и соседняя кнопка запуска в строке состояния |
-| Поиск | Фильтрация списка по названию, папке и описанию |
-| Запоминание выбора | Отдельно для каждой рабочей области |
-| Несколько папок | В списке видно имя папки; одноимённые задачи запускаются в своей папке |
-| Автоматическое обновление | После сохранения, создания или удаления `tasks.json` и изменений рабочей области |
-| Составные задачи | Поддержка `dependsOn` через штатную систему задач VS Code |
-| Настройки выполнения | Сохраняются `inputs`, переменные, `problemMatcher`, настройки терминала и платформенные переопределения |
-| Английский и русский | Язык интерфейса выбирается автоматически по языку редактора |
-
-Расширение показывает задачи из `.vscode/tasks.json`, секции `tasks` файла `.code-workspace` и пользовательского `tasks.json`, доступные через API VS Code. Поддерживаются `shell`, `process` и настроенные задачи поставщиков расширений, например `npm`.
-
-Для задач расширений должен быть установлен соответствующий поставщик. Автоматически обнаруженные задачи, которые не добавлены в `tasks.json`, в список не включаются. В недоверенной рабочей области расширение отключено средствами VS Code.
-
-## Локализация
-
-| Язык редактора | Интерфейс расширения |
-| --- | --- |
-| `en`, `en-US` | English |
-| `ru`, `ru-RU` | Русский |
-| Другие языки | English |
-
-Переведены подписи, подсказки, сообщения, команды, список выбора и описание расширения. Названия папок, названия и описания задач остаются такими, как вы их задали.
-
-Чтобы сменить язык, откройте **Configure Display Language** в палитре команд и перезапустите VS Code. Переводы хранятся в [package.nls.json](package.nls.json) и [package.nls.ru.json](package.nls.ru.json).
-
-## Команды
-
-Откройте палитру команд (`Ctrl+Shift+P`) и введите **Task Runner**:
-
-| English | Русский | Действие |
-| --- | --- | --- |
-| Select Task | Выбрать задачу | Открыть список задач |
-| Run Selected Task | Запустить выбранную задачу | Запустить текущую задачу |
-| Refresh Tasks | Обновить задачи | Перезагрузить список вручную |
-
-При ошибке запуска появится сообщение. Подробности доступны в **Output → Task Runner**. Если задач нет, расширение предложит открыть их настройку.
-
-## Разработка
-
-Расширение написано на JavaScript и не имеет зависимостей во время выполнения. Для разработки и сборки используйте **Node.js 22+** и npm.
+TypeScript · Node.js 22+ · npm
 
 ```sh
 npm ci
@@ -136,33 +35,8 @@ npm test
 npm run package
 ```
 
-В Windows PowerShell можно использовать `npm.cmd` вместо `npm`. Готовый пакет появится в корне проекта: `task-runner-statusbar-0.1.3.vsix`.
+Press **F5** in VS Code to debug. Tests and packaging compile automatically; the `.vsix` is created in the project root. On Windows, use `npm.cmd` if PowerShell blocks `npm.ps1`.
 
-### Запуск в VS Code
+---
 
-Откройте проект и нажмите **F5**. В окне **Extension Development Host** откройте этот проект или другую папку с `tasks.json`.
-
-В проекте уже есть задачи для проверки синтаксиса, тестирования, упаковки и составного запуска **Check and test**.
-
-### Проверки
-
-Автоматические тесты используют имитацию API VS Code: проверяют выбор и запуск, сохранение задачи, несколько папок, обновление файлов, ошибки, отмену, конкурентные обновления и локализацию.
-
-Для проверки в реальном редакторе выберите задачу, запустите её кнопкой **▶**, проверьте терминал, затем измените и сохраните `tasks.json`. Отдельно проверьте составную задачу и оба языка интерфейса.
-
-### Структура проекта
-
-```text
-assets/icon.png          Иконка расширения
-src/extension.js         Строка состояния, выбор и запуск
-src/task-model.js        Фильтрация и идентификация задач
-src/localization.js      Выбор языка и подстановка переводов
-test/extension.test.js   Автоматические тесты
-package.nls.json         Английские переводы
-package.nls.ru.json      Русские переводы
-.vscode/                Запуск расширения и примеры задач
-```
-
-## Автор и лицензия
-
-**a3st** · [MIT](LICENSE)
+By **a3st** · [MIT License](LICENSE)

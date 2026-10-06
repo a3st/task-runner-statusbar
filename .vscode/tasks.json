@@ -2,18 +2,34 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Compile extension",
+      "type": "shell",
+      "command": "npm run compile",
+      "windows": {
+        "command": "npm.cmd run compile"
+      },
+      "problemMatcher": "$tsc"
+    },
+    {
       "label": "Check extension",
       "type": "shell",
       "command": "npm run check",
-      "windows": { "command": "npm.cmd run check" },
+      "windows": {
+        "command": "npm.cmd run check"
+      },
       "problemMatcher": [],
-      "group": { "kind": "build", "isDefault": true }
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     },
     {
       "label": "Test extension",
       "type": "shell",
       "command": "npm test",
-      "windows": { "command": "npm.cmd test" },
+      "windows": {
+        "command": "npm.cmd test"
+      },
       "problemMatcher": [],
       "group": "test"
     },
@@ -21,12 +37,17 @@
       "label": "Package VSIX",
       "type": "shell",
       "command": "npm run package",
-      "windows": { "command": "npm.cmd run package" },
+      "windows": {
+        "command": "npm.cmd run package"
+      },
       "problemMatcher": []
     },
     {
       "label": "Check and test",
-      "dependsOn": ["Check extension", "Test extension"],
+      "dependsOn": [
+        "Check extension",
+        "Test extension"
+      ],
       "dependsOrder": "sequence",
       "problemMatcher": []
     }
